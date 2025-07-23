@@ -1,107 +1,95 @@
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
 
-// Mots et palette personnalisée
-const WORDS = [
-  { text: "Zen", color: "#a3e635" },          // Vert pastel
-  { text: "Aventure", color: "#fbbf24" },     // Jaune doré
-  { text: "Traditions", color: "#38bdf8" },   // Bleu clair
-  { text: "Nature", color: "#4ade80" },       // Vert menthe
-  { text: "Découverte", color: "#f472b6" },   // Rose sakura
-  { text: "Éveil", color: "#f87171" },        // Rouge doux
-  { text: "Spiritualité", color: "#818cf8" }, // Violet doux
-  { text: "Cérémonie", color: "#fde68a" },    // Jaune pastel
-  { text: "Sérénité", color: "#facc15" },     // Jaune intense
-  { text: "Culture", color: "#fda4af" },      // Rose pastel
-  { text: "Voyage", color: "#38bdf8" },       // Bleu clair
-  { text: "Inspiration", color: "#34d399" },  // Turquoise
-  { text: "Harmonie", color: "#e0e7ff" },     // Blanc bleuté
-  { text: "Rencontre", color: "#fbbf24" },    // Jaune doré
-  { text: "Exploration", color: "#a5b4fc" },  // Violet bleu
+// Les mots-clés qui vont tourner autour du titre (modifie-les si tu veux)
+const words = [
+  "Zen",
+  "Aventure",
+  "Nature",
+  "Traditions",
+  "Rencontre",
+  "Découverte",
+  "Immersion",
+  "Voyage",
+  "Sérénité",
+  "Saveurs"
 ];
 
-const POSITIONS = [
-  { top: "4%", left: "17%" },
-  { top: "13%", left: "70%" },
-  { top: "60%", left: "13%" },
-  { top: "65%", left: "78%" },
-  { top: "23%", left: "45%" },
-  { top: "85%", left: "35%" },
-  { top: "41%", left: "80%" },
-  { top: "77%", left: "59%" },
-  { top: "30%", left: "8%" },
-  { top: "82%", left: "81%" },
-];
+const container = {
+  animate: {
+    transition: {
+      staggerChildren: 0.15,
+      repeat: Infinity,
+      repeatType: "loop"
+    }
+  }
+};
+
+const item = {
+  initial: { opacity: 0, y: -40, scale: 0.6 },
+  animate: (i: number) => ({
+    opacity: 1,
+    y: [
+      -40,
+      Math.random() * 8 - 4, // petit flottement vertical
+      8,
+      -40
+    ],
+    scale: [
+      0.6,
+      1,
+      0.8 + Math.random() * 0.2,
+      0.6
+    ],
+    x: [
+      Math.sin((i / words.length) * Math.PI * 2) * 120,
+      Math.sin((i / words.length) * Math.PI * 2) * 100 + Math.random() * 6 - 3,
+      Math.sin((i / words.length) * Math.PI * 2) * 130,
+      Math.sin((i / words.length) * Math.PI * 2) * 120
+    ],
+    transition: {
+      duration: 5,
+      repeat: Infinity,
+      repeatType: "loop",
+      ease: "easeInOut"
+    }
+  })
+};
 
 export default function AnimatedWordsTrail() {
-  const [cycle, setCycle] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => setCycle((c) => c + 1), 3500);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Mélange à chaque cycle pour effet vivant
-  const displayed = WORDS
-    .map((w, i) => ({ ...w, pos: POSITIONS[i % POSITIONS.length] }))
-    .sort(() => 0.5 - Math.random())
-    .slice(0, 7);
-
   return (
-    <div className="absolute inset-0 pointer-events-none select-none z-20">
-      {displayed.map(({ text, color, pos }, i) => (
+    <motion.div
+      className="absolute left-1/2 top-[34%] z-30 pointer-events-none select-none"
+      style={{
+        transform: "translate(-50%, -60%)",
+        width: 340,
+        height: 240,
+        maxWidth: "90vw"
+      }}
+      variants={container}
+      animate="animate"
+      initial={false}
+      aria-hidden="true"
+    >
+      {words.map((word, i) => (
         <motion.span
-          key={text + cycle}
-          initial={{
-            opacity: 0,
-            y: Math.random() * 40 - 20,
-            x: Math.random() * 40 - 20,
-            scale: 0.82 + Math.random() * 0.35,
-            filter: "blur(2.5px)",
-          }}
-          animate={{
-            opacity: [0, 1, 1, 0],
-            filter: [
-              "blur(2.5px)",
-              "blur(0.5px)",
-              "blur(0.5px)",
-              "blur(4px)",
-            ],
-            y: [null, Math.random() * 24 - 12],
-            x: [null, Math.random() * 24 - 12],
-            scale: [null, 1.06, 1.15, 1],
-          }}
-          transition={{
-            duration: 3.5,
-            ease: "easeInOut",
-          }}
+          key={i}
+          custom={i}
+          variants={item}
+          initial="initial"
+          animate="animate"
+          className="absolute font-bold text-lg sm:text-2xl tracking-wide text-blue-100 drop-shadow-[0_1px_8px_#69f7] pointer-events-none select-none"
           style={{
-            position: "absolute",
-            top: pos.top,
-            left: pos.left,
-            color,
-            fontWeight: 700,
-            fontFamily: "'DM Serif Display', serif",
-            fontSize: "clamp(1.1rem, 2vw, 2.25rem)",
-            letterSpacing: "0.025em",
-            textShadow:
-              `
-                0 4px 18px ${color}44,
-                0 2px 8px #225d7c22,
-                0 1px 2px #0007
-              `,
-            pointerEvents: "none",
-            userSelect: "none",
-            opacity: 0.91,
-            zIndex: 22,
+            left: "50%",
+            top: "50%",
+            transform: "translate(-50%, -50%)",
             whiteSpace: "nowrap",
-            transition: "color 0.3s, text-shadow 0.3s",
-            filter: "drop-shadow(0 2px 8px #fff2)",
+            filter: `blur(0.5px) drop-shadow(0 0 10px #9ffcff88)`,
+            opacity: 0.92
           }}
         >
-          {text}
+          {word}
         </motion.span>
       ))}
-    </div>
+    </motion.div>
   );
 }
